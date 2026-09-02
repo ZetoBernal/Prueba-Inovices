@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "0QqjqSkAQG0=",
+  "success": true,
+  "projectFilePath": "/Volumes/SDD_Rances/Desarrollos/Prueba Tecnica Tribu/back-global-invoice/back-global-invoice.csproj",
+  "expectedPackageFiles": [
+    "/Users/rancesbernal/.nuget/packages/microsoft.aspnetcore.openapi/10.0.11/microsoft.aspnetcore.openapi.10.0.11.nupkg.sha512",
+    "/Users/rancesbernal/.nuget/packages/microsoft.openapi/2.7.5/microsoft.openapi.2.7.5.nupkg.sha512"
+  ],
+  "logs": []
+}
