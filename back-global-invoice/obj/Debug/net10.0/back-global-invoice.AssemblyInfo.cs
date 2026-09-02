@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("60f56fbc-9d8a-487c-9fc0-f40e577d4ff4")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("back-global-invoice")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4dfb2f4238b1a7cb5cfd638ae9639762b34bac6b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07b473950be382940caeebd0a9d9e5a980db47c6")]
 [assembly: System.Reflection.AssemblyProductAttribute("back-global-invoice")]
 [assembly: System.Reflection.AssemblyTitleAttribute("back-global-invoice")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
