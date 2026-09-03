@@ -1,0 +1,80 @@
+<div class="header">
+    <h1>Facturas</h1>
+
+    @if (canCreate()) {
+        <a mat-flat-button color="primary" routerLink="/invoices/new">
+            <mat-icon>add</mat-icon>
+            Nueva factura
+        </a>
+    }
+</div>
+
+@if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+}
+
+@if (error(); as message) {
+    <p class="error" role="alert">{{ message }}</p>
+}
+
+@if (isEmpty()) {
+    <mat-card appearance="outlined" class="empty">
+        <mat-icon>receipt_long</mat-icon>
+        <p>Todavía no hay facturas registradas.</p>
+    </mat-card>
+} @else {
+    <mat-card appearance="outlined">
+        <table mat-table [dataSource]="invoices()">
+
+            <ng-container matColumnDef="number">
+                <th mat-header-cell *matHeaderCellDef>N°</th>
+                <td mat-cell *matCellDef="let invoice">{{ invoice.number }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="customerName">
+                <th mat-header-cell *matHeaderCellDef>Cliente</th>
+                <td mat-cell *matCellDef="let invoice">{{ invoice.customerName }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                <td mat-cell *matCellDef="let invoice">
+                    <span class="chip" [class]="'chip--' + invoice.type.toLowerCase()">
+                        {{ invoice.type }}
+                    </span>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="subtotal">
+                <th mat-header-cell *matHeaderCellDef class="right">Subtotal</th>
+                <td mat-cell *matCellDef="let invoice" class="right">
+                    {{ invoice.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="total">
+                <th mat-header-cell *matHeaderCellDef class="right">Total</th>
+                <td mat-cell *matCellDef="let invoice" class="right strong">
+                    {{ invoice.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="createdAt">
+                <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                <td mat-cell *matCellDef="let invoice">{{ invoice.createdAt | date:'dd/MM/yyyy' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let invoice">
+                    <button mat-icon-button aria-label="Ver detalle">
+                        <mat-icon>visibility</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        </table>
+    </mat-card>
+}
