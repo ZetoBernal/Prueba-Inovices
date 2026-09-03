@@ -3,6 +3,7 @@ using back_global_invoice.Domain;
 using back_global_invoice.Features.Invoices.Dtos;
 using back_global_invoice.Taxes;
 using Microsoft.EntityFrameworkCore;
+using back_global_invoice.Legacy;
 
 namespace back_global_invoice.Features.Invoices;
 
@@ -10,10 +11,10 @@ public interface IInvoiceService
 {
     Task<InvoiceResponse> CreateAsync(CreateInvoiceRequest request, string username, CancellationToken ct = default);
     Task<IReadOnlyList<InvoiceResponse>> GetAllAsync(CancellationToken ct = default);
-    Task<InvoiceResponse?> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<InvoiceDetailResponse?> GetByIdAsync(int id, CancellationToken ct = default);
 }
 
-public class InvoiceService(AppDbContext db, ITaxCalculatorFactory taxCalculators) : IInvoiceService
+public class InvoiceService(AppDbContext db, ITaxCalculatorFactory taxCalculators, INumberToWordsService numberToWords) : IInvoiceService
 {
     public async Task<InvoiceResponse> CreateAsync(
         CreateInvoiceRequest request, string username, CancellationToken ct = default)
@@ -51,12 +52,21 @@ public class InvoiceService(AppDbContext db, ITaxCalculatorFactory taxCalculator
             .Select(i => ToResponse(i))
             .ToListAsync(ct);
 
-    public async Task<InvoiceResponse?> GetByIdAsync(int id, CancellationToken ct = default) =>
-        await db.Invoices
+    public async Task<InvoiceDetailResponse?> GetByIdAsync(int id, CancellationToken ct = default)
+    {
+        var invoice = await db.Invoices
             .AsNoTracking()
-            .Where(i => i.Id == id)
-            .Select(i => ToResponse(i))
-            .SingleOrDefaultAsync(ct);
+            .SingleOrDefaultAsync(i => i.Id == id, ct);
+
+        if (invoice is null) return null;
+
+        var totalInWords = await numberToWords.ConvertAsync(invoice.Total, ct);
+
+        return new InvoiceDetailResponse(
+            invoice.Id, invoice.Number, invoice.CustomerName, invoice.Type.ToString(),
+            invoice.Subtotal, invoice.Iva, invoice.Retencion, invoice.Total,
+            invoice.CustomsCode, invoice.CreatedAt, totalInWords);
+    }
 
     private async Task<string> NextNumberAsync(CancellationToken ct)
     {
