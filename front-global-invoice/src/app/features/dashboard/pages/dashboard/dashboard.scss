@@ -1,0 +1,155 @@
+.page-title {
+    margin: 0 0 1.25rem;
+    font-size: 1.5rem;
+}
+
+.error {
+    color: var(--mat-sys-error);
+}
+
+.kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.kpi {
+    padding: 1.1rem 1.25rem;
+
+    &__head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    &__label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        opacity: 0.6;
+    }
+
+    &__icon {
+        opacity: 0.35;
+    }
+
+    &__value {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 1.9rem;
+        font-weight: 700;
+        line-height: 1.1;
+    }
+}
+
+.panels {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 1rem;
+    align-items: start;
+
+    @media (max-width: 980px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.panel {
+    padding: 1.25rem;
+
+    &__title {
+        margin: 0 0 1rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        opacity: 0.75;
+    }
+}
+
+.breakdown {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+
+    th {
+        text-align: left;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        opacity: 0.55;
+        padding-bottom: 0.6rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    td {
+        padding: 0.7rem 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+}
+
+.right { text-align: right; }
+.strong { font-weight: 700; }
+.muted { opacity: 0.6; }
+.breakdown th.pct-col,
+.breakdown td.pct-col {
+    width: 34%;
+    padding-left: 1.75rem;
+}
+
+.count {
+    display: block;
+    margin-left: 1.1rem;
+    font-size: 0.72rem;
+    opacity: 0.5;
+}
+
+.dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-right: 0.55rem;
+    vertical-align: middle;
+}
+
+.pct {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    &__track {
+        flex: 1;
+        height: 8px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.07);
+        overflow: hidden;
+    }
+
+    &__fill {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 0.5s ease;
+    }
+
+    &__value {
+        min-width: 46px;
+        text-align: right;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 3rem;
+    opacity: 0.7;
+}

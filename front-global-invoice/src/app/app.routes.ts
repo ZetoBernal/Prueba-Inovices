@@ -20,6 +20,12 @@ export const routes: Routes = [
         path: 'invoices',
         loadChildren: () =>
           import('@features/invoices/invoices.routes').then(m => m.INVOICES_ROUTES)
+      },
+      {
+        path: 'dashboard',
+        canActivate: [roleGuard('AUDITOR')],
+        loadChildren: () =>
+          import('@features/dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES)
       }
     ]
   },
