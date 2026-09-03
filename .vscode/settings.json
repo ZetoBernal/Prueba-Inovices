@@ -1,3 +1,3 @@
 {
-    "dotnet.defaultSolution": "back-global-invoice.slnx"
+    "dotnet.defaultSolution": "back/GlobalInvoice.slnx"
 }

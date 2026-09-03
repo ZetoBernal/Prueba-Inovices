@@ -488,7 +488,7 @@ dist/
 
 # Reportes de cobertura y diagnóstico (se regeneran localmente)
 coveragereport/
-back-global-invoice.Tests/TestResults/
+back/back-global-invoice.Tests/TestResults/
 diag*.log
 diag.*.log/
 
