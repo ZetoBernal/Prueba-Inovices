@@ -5,11 +5,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace back_global_invoice.Tests.Legacy;
 
-/// <summary>
-/// Doble de prueba del transporte HTTP: nos permite simular tanto una
-/// respuesta SOAP válida como una caída del sistema legado, sin depender
-/// de que el servicio real de internet esté disponible durante los tests.
-/// </summary>
 file class StubHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler
 {
     protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct) =>
@@ -59,8 +54,6 @@ public class NumberToWordsSoapServiceTests
     [Fact]
     public async Task ConvertAsync_DevuelveNullSiElServicioLegadoNoResponde()
     {
-        // RF-03: el sistema legado caído no debe lanzar una excepción hacia
-        // arriba; el detalle de la factura debe poder mostrarse igual.
         var service = BuildService(new ThrowingHttpMessageHandler());
 
         var result = await service.ConvertAsync(100m);
@@ -94,8 +87,6 @@ public class NumberToWordsSoapServiceTests
         await service.ConvertAsync(100m);
         await service.ConvertAsync(100m);
 
-        // La segunda llamada se sirve desde caché: el servicio externo se
-        // invoca una sola vez para el mismo monto.
         Assert.Equal(1, llamadas);
     }
 }

@@ -7,10 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace back_global_invoice.Tests.Controllers;
 
-/// <summary>
-/// Doble de prueba: el controller no necesita saber cómo se calculan los
-/// impuestos ni cómo se persiste la factura, solo delega en la interfaz.
-/// </summary>
 class FakeInvoiceService : IInvoiceService
 {
     public InvoiceResponse? CreateResult { get; set; }

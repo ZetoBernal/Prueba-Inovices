@@ -8,8 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace back_global_invoice.Tests.Invoices;
 
-// Doble de prueba: aísla el servicio del SOAP real (RNF-02: el frontend ni
-// siquiera sabe que existe; aquí tampoco necesitamos que exista de verdad).
 file class FakeNumberToWordsService(string? result = "test words") : INumberToWordsService
 {
     public Task<string?> ConvertAsync(decimal amount, CancellationToken ct = default) =>
@@ -58,8 +56,6 @@ public class InvoiceServiceTests
     {
         var service = BuildService();
 
-        // Aunque el cliente lo mande, el backend no confía en el payload:
-        // solo persiste el código aduanero cuando el tipo es Exportación.
         var result = await service.CreateAsync(new CreateInvoiceRequest
         {
             CustomerName = "Cliente Nacional",
@@ -133,8 +129,6 @@ public class InvoiceServiceTests
     [Fact]
     public async Task GetByIdAsync_NoRompeSiElServicioSoapNoRespondio()
     {
-        // RF-03: si el sistema legado falla, la factura se sigue mostrando,
-        // solo con el total en letras en null.
         var service = BuildService(wordsResult: null);
 
         var created = await service.CreateAsync(

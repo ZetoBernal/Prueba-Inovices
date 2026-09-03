@@ -25,7 +25,6 @@ public class JwtTokenGeneratorTests
         var (token, _) = _generator.Generate(user);
         var claims = new JwtSecurityTokenHandler().ReadJwtToken(token).Claims.ToList();
 
-        // Este es el claim del que depende TODO el [Authorize(Roles = ...)] del backend.
         Assert.Contains(claims, c => c.Type == ClaimTypes.Role && c.Value == Roles.Auditor);
     }
 

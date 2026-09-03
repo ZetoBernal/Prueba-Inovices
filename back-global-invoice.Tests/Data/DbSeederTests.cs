@@ -53,7 +53,6 @@ public class DbSeederTests
         var invoices = await db.Invoices.ToListAsync();
 
         Assert.Equal(7, invoices.Count);
-        // Los montos deben venir del motor de tributación real, no escritos a mano.
         Assert.All(invoices, i => Assert.True(i.Total >= i.Subtotal - i.Retencion));
     }
 

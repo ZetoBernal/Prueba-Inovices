@@ -30,10 +30,9 @@ public class GovernmentTaxCalculatorTests
     [Fact]
     public void Calculate_LaRetencionSeCalculaSobreElSubtotalNoSobreSubtotalMasIva()
     {
-        // Supuesto documentado del proyecto: la retención va sobre el subtotal.
         var result = _calculator.Calculate(1_000_000m);
 
-        Assert.Equal(50_000m, result.Retencion);       // 5% de 1.000.000
-        Assert.NotEqual(59_500m, result.Retencion);    // NO 5% de 1.190.000 (subtotal + IVA)
+        Assert.Equal(50_000m, result.Retencion);
+        Assert.NotEqual(59_500m, result.Retencion);
     }
 }

@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace back_global_invoice.Features.Login.Dtos;
 
+[ExcludeFromCodeCoverage]
 public class LoginRequest
 {
     [Required(ErrorMessage = "El usuario es obligatorio.")]

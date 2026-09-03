@@ -29,7 +29,6 @@ public class NationalTaxCalculatorTests
     [Fact]
     public void Calculate_RedondeaAPesoEnteroConAwayFromZero()
     {
-        // 1.050.005 * 19% = 199.500,95 -> debe subir a 199.501, no bajar a 199.500.
         var result = _calculator.Calculate(1_050_005m);
 
         Assert.Equal(199_501m, result.Iva);

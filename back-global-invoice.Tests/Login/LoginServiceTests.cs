@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace back_global_invoice.Tests.Login;
 
-// Doble de prueba: no necesitamos generar un JWT real para probar el login.
 file class FakeJwtTokenGenerator : IJwtTokenGenerator
 {
     public (string Token, DateTime ExpiresAt) Generate(User user) =>
@@ -61,8 +60,6 @@ public class LoginServiceTests
     [Fact]
     public async Task LoginAsync_DevuelveNullSiElUsuarioNoExiste()
     {
-        // Este es el camino del hash señuelo: no debe lanzar excepción,
-        // solo devolver null como si la contraseña fuera incorrecta.
         var service = BuildService();
 
         var result = await service.LoginAsync(

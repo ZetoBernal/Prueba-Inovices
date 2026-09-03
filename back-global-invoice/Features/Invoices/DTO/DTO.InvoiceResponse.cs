@@ -1,5 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 namespace back_global_invoice.Features.Invoices.Dtos;
 
+[ExcludeFromCodeCoverage]
 public record InvoiceResponse(
     int Id,
     string Number,
