@@ -1,6 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 
-import { Invoice } from '../models/invoice.model';
+import { CreateInvoiceRequest, Invoice } from '../models/invoice.model';
 import { InvoiceApiService } from './invoice-api.service';
 import { groupTotalsByType } from './invoice-totals';
 
@@ -49,6 +50,10 @@ export class InvoiceStore {
 
     addInvoice(invoice: Invoice): void {
         this._invoices.update(current => [invoice, ...current]);
+    }
+
+    create(request: CreateInvoiceRequest): Observable<Invoice> {
+        return this.api.create(request).pipe(tap(invoice => this.addInvoice(invoice)));
     }
 
     reload(): void {

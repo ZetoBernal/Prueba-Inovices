@@ -24,8 +24,8 @@ export interface CreateInvoiceRequest {
     customsCode?: string;
 }
 
-export const INVOICE_TYPES = [
-    { value: 1, name: 'Nacional' as const },
-    { value: 2, name: 'Exportacion' as const },
-    { value: 3, name: 'Gubernamental' as const }
+export const INVOICE_TYPE_OPTIONS: ReadonlyArray<{ value: number; name: InvoiceTypeName; label: string }> = [
+    { value: 1, name: 'Nacional', label: 'Nacional' },
+    { value: 2, name: 'Exportacion', label: 'Exportación' },
+    { value: 3, name: 'Gubernamental', label: 'Gubernamental' }
 ];
