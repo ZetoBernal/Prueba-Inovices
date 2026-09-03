@@ -16,10 +16,8 @@ public static class DbSeeder
         await SeedInvoicesAsync(db, taxCalculators, ct);
     }
 
-    private static async Task SeedUsersAsync(AppDbContext db, CancellationToken ct = default)
+    internal static async Task SeedUsersAsync(AppDbContext db, CancellationToken ct = default)
     {
-        await db.Database.MigrateAsync(ct);
-
         if (await db.Users.AnyAsync(ct)) return;
 
         db.Users.AddRange(
@@ -39,7 +37,7 @@ public static class DbSeeder
         await db.SaveChangesAsync(ct);
     }
 
-    private static async Task SeedInvoicesAsync(AppDbContext db, ITaxCalculatorFactory taxCalculators, CancellationToken ct)
+    internal static async Task SeedInvoicesAsync(AppDbContext db, ITaxCalculatorFactory taxCalculators, CancellationToken ct)
     {
         if (await db.Invoices.AnyAsync(ct)) return;
 

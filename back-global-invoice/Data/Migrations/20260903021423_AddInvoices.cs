@@ -1,12 +1,14 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using System.Diagnostics.CodeAnalysis;
 
 #nullable disable
 
 namespace back_global_invoice.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddInvoices : Migration
+    [ExcludeFromCodeCoverage]
+public partial class AddInvoices : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -5,7 +6,8 @@
 namespace back_global_invoice.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    [ExcludeFromCodeCoverage]
+public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
