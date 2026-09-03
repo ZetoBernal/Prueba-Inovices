@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using back_global_invoice.Taxes;
+using back_global_invoice.Features.Invoices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,16 +70,27 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<ILoginService, LoginService>();
+builder.Services.AddScoped<ITaxCalculator, NationalTaxCalculator>();
+builder.Services.AddScoped<ITaxCalculator, ExportTaxCalculator>();
+builder.Services.AddScoped<ITaxCalculator, GovernmentTaxCalculator>();
+builder.Services.AddScoped<ITaxCalculatorFactory, TaxCalculatorFactory>();
+builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await DbSeeder.SeedAsync(db);
+    var taxCalculators = scope.ServiceProvider.GetRequiredService<ITaxCalculatorFactory>();
+
+    await DbSeeder.SeedAsync(db, taxCalculators);
 }
 
 if (app.Environment.IsDevelopment())
