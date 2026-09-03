@@ -1,0 +1,78 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>Factura {{ invoice()?.number }}</h2>
+  <button mat-icon-button (click)="close()" aria-label="Cerrar">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<mat-dialog-content>
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  @if (error(); as message) {
+    <p class="error" role="alert">{{ message }}</p>
+  }
+
+  @if (invoice(); as inv) {
+    <div class="meta">
+      <div>
+        <span class="meta__label">Cliente</span>
+        <strong>{{ inv.customerName }}</strong>
+      </div>
+      <div>
+        <span class="meta__label">Tipo</span>
+        <span class="chip" [class]="'chip--' + inv.type.toLowerCase()">{{ inv.type }}</span>
+      </div>
+      <div>
+        <span class="meta__label">Fecha</span>
+        <strong>{{ inv.createdAt | date:'dd/MM/yyyy' }}</strong>
+      </div>
+      @if (inv.customsCode) {
+        <div>
+          <span class="meta__label">Código Aduanero</span>
+          <strong>{{ inv.customsCode }}</strong>
+        </div>
+      }
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown__row">
+        <span>Subtotal</span>
+        <strong>{{ inv.subtotal | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+      </div>
+      <div class="breakdown__row">
+        <span>IVA</span>
+        <strong>{{ inv.iva | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+      </div>
+      @if (inv.retencion > 0) {
+        <div class="breakdown__row breakdown__row--negative">
+          <span>Retención en la fuente</span>
+          <strong>&minus;{{ inv.retencion | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+        </div>
+      }
+      <div class="breakdown__row breakdown__row--total">
+        <span>Total a pagar</span>
+        <strong>{{ inv.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+      </div>
+    </div>
+
+    <div class="words">
+      <span class="words__label">Total en letras</span>
+
+      @if (inv.totalInWords) {
+        <p class="words__value">{{ inv.totalInWords }}</p>
+      } @else {
+        <p class="words__unavailable">
+          <mat-icon inline>cloud_off</mat-icon>
+          No disponible en este momento: el sistema de auditoría gubernamental (SOAP) no respondió.
+          El resto de la factura se muestra con normalidad.
+        </p>
+      }
+    </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" (click)="close()">Cerrar</button>
+</mat-dialog-actions>

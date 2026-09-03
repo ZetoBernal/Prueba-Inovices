@@ -5,12 +5,14 @@ import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule } from '@angular/material/table';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { InvoiceStore } from '../../../../core/invoices/invoice.store';
+import { InvoiceDetailDialog } from '../../components/invoice-detail-dialog/invoice-detail-dialog';
 
 @Component({
     selector: 'app-invoice-list',
@@ -33,6 +35,7 @@ import { InvoiceStore } from '../../../../core/invoices/invoice.store';
 export class InvoiceList {
     private readonly store = inject(InvoiceStore);
     private readonly auth = inject(AuthService);
+    private readonly dialog = inject(MatDialog);
 
     readonly invoices = this.store.invoices;
     readonly loading = this.store.loading;
@@ -45,5 +48,13 @@ export class InvoiceList {
 
     constructor() {
         this.store.ensureLoaded();
+    }
+
+    openDetail(invoiceId: number): void {
+        this.dialog.open(InvoiceDetailDialog, {
+            data: { invoiceId },
+            width: '440px',
+            autoFocus: false
+        });
     }
 }
