@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("back-global-invoice")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+991d658627705a791a282657828beb01585fcfa8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c3a381e9c12b16f7ac8a58cc877b15d19775f3c")]
 [assembly: System.Reflection.AssemblyProductAttribute("back-global-invoice")]
 [assembly: System.Reflection.AssemblyTitleAttribute("back-global-invoice")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

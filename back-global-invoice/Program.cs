@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using back_global_invoice.Taxes;
 using back_global_invoice.Features.Invoices;
+using back_global_invoice.Legacy;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,6 +82,15 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
+
+builder.Services.AddMemoryCache();
+
+builder.Services.AddHttpClient<INumberToWordsService, NumberToWordsSoapService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["LegacyServices:NumberConversionUrl"]!);
+
+    client.Timeout = TimeSpan.FromSeconds(5);
 });
 
 var app = builder.Build();
