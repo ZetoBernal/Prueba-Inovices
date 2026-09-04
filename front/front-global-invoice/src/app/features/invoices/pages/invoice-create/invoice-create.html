@@ -1,0 +1,66 @@
+<div class="page">
+  <h1 class="page-title">Nueva factura</h1>
+
+  <mat-card appearance="outlined" class="form-card">
+    @if (submitting()) {
+      <mat-progress-bar mode="indeterminate" />
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="form">
+
+      <mat-form-field appearance="outline">
+        <mat-label>Cliente</mat-label>
+        <input matInput formControlName="customerName" maxlength="150" autocomplete="off" />
+        @if (form.controls.customerName.hasError('required')) {
+          <mat-error>El cliente es obligatorio</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Tipo de factura</mat-label>
+        <mat-select formControlName="type">
+          @for (option of invoiceTypes; track option.value) {
+            <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.type.hasError('required')) {
+          <mat-error>Selecciona un tipo de factura</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Subtotal</mat-label>
+        <span matTextPrefix>$&nbsp;</span>
+        <input matInput type="number" formControlName="subtotal" min="1" step="1" />
+        <mat-hint>Pesos colombianos</mat-hint>
+        @if (form.controls.subtotal.hasError('required')) {
+          <mat-error>El subtotal es obligatorio</mat-error>
+        }
+        @if (form.controls.subtotal.hasError('min')) {
+          <mat-error>Debe ser mayor que cero</mat-error>
+        }
+      </mat-form-field>
+
+      @if (showCustomsCode()) {
+        <mat-form-field appearance="outline">
+          <mat-label>Código Aduanero</mat-label>
+          <input matInput formControlName="customsCode" maxlength="30" autocomplete="off" />
+          @if (form.controls.customsCode?.hasError('required')) {
+            <mat-error>Obligatorio para facturas de exportación</mat-error>
+          }
+        </mat-form-field>
+      }
+
+      @if (errorMessage(); as message) {
+        <p class="error" role="alert">{{ message }}</p>
+      }
+
+      <div class="actions">
+        <button mat-stroked-button type="button" (click)="cancel()">Cancelar</button>
+        <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+          {{ submitting() ? 'Guardando…' : 'Guardar factura' }}
+        </button>
+      </div>
+    </form>
+  </mat-card>
+</div>

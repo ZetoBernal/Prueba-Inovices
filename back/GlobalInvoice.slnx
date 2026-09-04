@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="back-global-invoice.Tests/back-global-invoice.Tests.csproj" />
+  <Project Path="back-global-invoice/back-global-invoice.csproj" />
+</Solution>

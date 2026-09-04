@@ -1,0 +1,25 @@
+<mat-toolbar color="primary">
+    <span class="brand">Global Invoice</span>
+
+    <nav class="links">
+        <a mat-button routerLink="/invoices" routerLinkActive="active">Facturas</a>
+
+        @if (canSeeDashboard()) {
+            <a mat-button routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        }
+    </nav>
+
+    <span class="spacer"></span>
+
+    @if (user(); as currentUser) {
+        <span class="user">{{ currentUser.username }} · {{ currentUser.role }}</span>
+    }
+
+    <button mat-icon-button (click)="logout()" aria-label="Cerrar sesión">
+        <mat-icon>logout</mat-icon>
+    </button>
+</mat-toolbar>
+
+<main class="content">
+    <router-outlet />
+</main>

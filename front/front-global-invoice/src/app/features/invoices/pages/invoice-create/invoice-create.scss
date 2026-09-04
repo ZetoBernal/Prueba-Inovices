@@ -1,0 +1,59 @@
+.page-title {
+    margin: 0 0 1.25rem;
+    font-size: 1.5rem;
+}
+
+.form-card {
+    max-width: 520px;
+    padding: 1.5rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.preview {
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.035);
+    padding: 1rem 1.1rem;
+    margin: 0.5rem 0 1rem;
+
+    &__row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.3rem 0;
+        font-size: 0.9rem;
+
+        &--negative strong { color: var(--mat-sys-error, #b3261e); }
+
+        &--total {
+            margin-top: 0.35rem;
+            padding-top: 0.55rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            font-size: 1rem;
+
+            strong { font-size: 1.05rem; }
+        }
+    }
+
+    &__note {
+        margin: 0.6rem 0 0;
+        font-size: 0.72rem;
+        opacity: 0.6;
+    }
+}
+
+.error {
+    color: var(--mat-sys-error, #b3261e);
+    margin: 0 0 0.75rem;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+}
