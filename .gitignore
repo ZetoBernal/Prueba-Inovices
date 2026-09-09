@@ -494,3 +494,9 @@ diag.*.log/
 
 # macOS
 .DS_Store
+
+# Claves privadas del certificado de desarrollo (AA2 - Seguridad en Software).
+# El certificado publico (certs/server.cert.pem) SI se sube: es lo que necesita
+# quien clone el repo para que el candado funcione. La clave privada, nunca.
+certs/*.key.pem
+certs/key.pem

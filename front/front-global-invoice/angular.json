@@ -30,7 +30,10 @@
                 "input": "public"
               }
             ],
-            "styles": ["@angular/cdk/overlay-prebuilt.css", "src/styles.scss"],
+            "styles": [
+              "@angular/cdk/overlay-prebuilt.css",
+              "src/styles.scss"
+            ],
             "security": {
               "allowedHosts": []
             }
@@ -75,7 +78,14 @@
               "buildTarget": "front-global-invoice:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "ssl": true,
+            "sslCert": "../../certs/server.cert.pem",
+            "sslKey": "../../certs/server.key.pem",
+            "host": "localhost",
+            "port": 4200
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"

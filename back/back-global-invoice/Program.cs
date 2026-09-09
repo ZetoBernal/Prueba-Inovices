@@ -20,8 +20,18 @@ builder.Services.Configure<JwtSettings>(
 var jwt = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
     ?? throw new InvalidOperationException("Falta JWT.");
 
+// Taller AA2: si no hay cadena de conexion configurada se usa una base en memoria,
+// para poder levantar la API sobre HTTPS sin depender de una instancia de SQL Server.
+// Con la cadena presente el comportamiento es el de siempre.
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    if (string.IsNullOrWhiteSpace(connectionString))
+        options.UseInMemoryDatabase("GlobalInvoiceTaller");
+    else
+        options.UseSqlServer(connectionString);
+});
 
 const string CorsPolicy = "AngularApp";
 

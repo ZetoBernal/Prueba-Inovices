@@ -10,7 +10,12 @@ public static class DbSeeder
     public static async Task SeedAsync(
         AppDbContext db, ITaxCalculatorFactory taxCalculators, CancellationToken ct = default)
     {
-        await db.Database.MigrateAsync(ct);
+        // Las migraciones solo existen en proveedores relacionales; con la base en
+        // memoria que usa el taller basta con crear el esquema.
+        if (db.Database.IsRelational())
+            await db.Database.MigrateAsync(ct);
+        else
+            await db.Database.EnsureCreatedAsync(ct);
 
         await SeedUsersAsync(db, ct);
         await SeedInvoicesAsync(db, taxCalculators, ct);
