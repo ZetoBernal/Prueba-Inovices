@@ -102,3 +102,5 @@ cd front/front-global-invoice && npx ng test --watch=false
 - El consecutivo de número de factura se genera contando filas; con alta concurrencia existe una condición de carrera teórica. En producción se resolvería con una secuencia de base de datos.
 - El pipeline de CI valida build y pruebas, pero aún no aplica un umbral mínimo de cobertura como gate de fallo.
 - El flujo de ramas actual es `dev` → `main` vía PR; una etapa intermedia de `test` está planeada como siguiente paso.
+
+Prueba de Software Fabric con Claude
