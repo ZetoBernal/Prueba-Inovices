@@ -91,6 +91,10 @@ cd front/front-global-invoice && npx ng test --watch=false
 
 `.github/workflows/ci.yml` ejecuta, en cada push/PR a `main` y `dev`: restauración de dependencias, build en modo Release y la suite de pruebas para el backend; `npm ci`, pruebas y build de producción para el frontend.
 
+## Línea base
+
+La versión `v1.0.0` es la primera línea base del proyecto: el punto de referencia estable para el control de cambios. Lo que incluye está en [CHANGELOG.md](CHANGELOG.md); la estructura de la base de datos, en [docs/BASE_DE_DATOS.md](docs/BASE_DE_DATOS.md), y el despliegue paso a paso, en [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md). El código se distribuye con licencia MIT ([LICENSE.txt](LICENSE.txt)).
+
 ## Supuestos documentados
 
 - **Retención en la fuente (Gubernamental):** se calcula sobre el **subtotal**, no sobre subtotal + IVA. El enunciado no lo especifica; es la práctica estándar de retención en Colombia.
