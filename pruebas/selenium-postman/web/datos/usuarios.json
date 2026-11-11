@@ -1,0 +1,32 @@
+{
+  "validos": [
+    {
+      "caso": "CP-W04",
+      "usuario": "operador",
+      "clave": "Operador123*",
+      "rol": "OPERADOR",
+      "rutaInicio": "/invoices",
+      "puedeCrear": true
+    },
+    {
+      "caso": "CP-W05",
+      "usuario": "auditor",
+      "clave": "Auditor123*",
+      "rol": "AUDITOR",
+      "rutaInicio": "/dashboard",
+      "puedeCrear": false
+    }
+  ],
+  "invalido": {
+    "caso": "CP-W03",
+    "usuario": "operador",
+    "clave": "ClaveIncorrecta1",
+    "mensajeEsperado": "Usuario o contraseña incorrectos."
+  },
+  "claveCorta": {
+    "caso": "CP-W02",
+    "usuario": "operador",
+    "clave": "123",
+    "mensajeEsperado": "Mínimo 6 caracteres"
+  }
+}

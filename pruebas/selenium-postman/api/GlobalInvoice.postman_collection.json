@@ -1,0 +1,1116 @@
+{
+  "info": {
+    "_postman_id": "233403b2-7548-47bb-bfb6-f6bdc025324c",
+    "name": "Global Invoice - Pruebas API REST",
+    "description": "Pruebas funcionales automatizadas de la API de Global Invoice (repositorio ZetoBernal/Prueba-Inovices).\n\nTaller AA1 - Unidad 2, Prueba y Calidad de Software. Autor: Rances Bernal Gonzalez.\n\nEjecución por consola:\n`npm run test:api` (Newman, con los casos de `api/datos/casos-facturas.csv`).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{tokenOperador}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Al iniciar la corrida se limpian los valores de una ejecución anterior.",
+          "if (pm.info.iteration === 0 && pm.info.requestName.startsWith('CP-A01')) {",
+          "    ['tokenOperador', 'tokenAuditor', 'idFacturaCreada', 'numeroFacturaCreada', 'intentosLogin']",
+          "        .forEach(v => pm.collectionVariables.unset(v));",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Verificaciones comunes a todas las peticiones.",
+          "pm.test('[General] Responde en menos de 6 segundos', () => {",
+          "    pm.expect(pm.response.responseTime).to.be.below(6000);",
+          "});",
+          "if (pm.response.text().length > 0) {",
+          "    pm.test('[General] El cuerpo es JSON', () => {",
+          "        pm.expect(pm.response.headers.get('Content-Type')).to.match(/json/);",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01 Autenticación",
+      "description": "Login con JWT, validación de entrada y protección de rutas.",
+      "item": [
+        {
+          "name": "CP-A01 Login OPERADOR válido",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Login exitoso: debe devolver un JWT y el rol del usuario.",
+                  "const cuerpo = pm.response.json();",
+                  "",
+                  "pm.test('CP-A01 Código 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('CP-A01 Devuelve un token con formato JWT (3 segmentos)', () => {",
+                  "    pm.expect(cuerpo.token).to.be.a('string').and.match(/^[\\w-]+\\.[\\w-]+\\.[\\w-]+$/);",
+                  "});",
+                  "pm.test('CP-A01 El rol es OPERADOR', () => pm.expect(cuerpo.role).to.eql('OPERADOR'));",
+                  "pm.test('CP-A01 La fecha de expiración es futura', () => {",
+                  "    pm.expect(new Date(cuerpo.expiresAt).getTime()).to.be.above(Date.now());",
+                  "});",
+                  "",
+                  "// Se guarda el token para las peticiones siguientes (autorización heredada).",
+                  "pm.collectionVariables.set('tokenOperador', cuerpo.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Autentica al usuario OPERADOR y guarda el token en la variable de colección `tokenOperador`.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuarioOperador}}\",\n  \"password\": \"{{claveOperador}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "CP-A02 Login AUDITOR válido",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = pm.response.json();",
+                  "",
+                  "pm.test('CP-A02 Código 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('CP-A02 El rol es AUDITOR', () => pm.expect(cuerpo.role).to.eql('AUDITOR'));",
+                  "",
+                  "pm.collectionVariables.set('tokenAuditor', cuerpo.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuarioAuditor}}\",\n  \"password\": \"{{claveAuditor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "CP-A03 Login con contraseña incorrecta",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CP-A03 Código 401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "pm.test('CP-A03 Mensaje genérico (no revela si el usuario existe)', () => {",
+                  "    pm.expect(pm.response.json().message).to.eql('Usuario o contraseña incorrectos.');",
+                  "});",
+                  "pm.test('CP-A03 No entrega token', () => pm.expect(pm.response.json()).to.not.have.property('token'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuarioOperador}}\",\n  \"password\": \"ClaveIncorrecta1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "CP-A04 Login sin datos",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const cuerpo = pm.response.json();",
+                  "",
+                  "pm.test('CP-A04 Código 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('CP-A04 Reporta usuario y contraseña obligatorios', () => {",
+                  "    // Se compara sin distinguir mayúsculas (Username / username).",
+                  "    const campos = Object.keys(cuerpo.errors).map(c => c.toLowerCase());",
+                  "    pm.expect(campos).to.include.members(['username', 'password']);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "CP-A05 Consultar sesión con token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CP-A05 Código 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('CP-A05 Identifica al usuario del token', () => {",
+                  "    const cuerpo = pm.response.json();",
+                  "    pm.expect(cuerpo.username).to.eql(pm.environment.get('usuarioOperador'));",
+                  "    pm.expect(cuerpo.role).to.eql('OPERADOR');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "CP-A06 Consultar sesión sin token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CP-A06 Código 401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "pm.test('CP-A06 Indica el esquema Bearer', () => {",
+                  "    pm.expect(pm.response.headers.get('WWW-Authenticate')).to.include('Bearer');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "CP-A07 Token manipulado",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }",
+                  "const token = pm.collectionVariables.get('tokenOperador') || 'a.b.c';",
+                  "const partes = token.split('.');",
+                  "partes[2] = partes[2].split('').reverse().join('');",
+                  "pm.variables.set('tokenManipulado', partes.join('.'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se altera la firma del JWT: el servidor debe rechazarlo.",
+                  "pm.test('CP-A07 Código 401 con firma inválida', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenManipulado}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 Consulta de facturas",
+      "description": "Listado, detalle, recurso inexistente y acceso sin token.",
+      "item": [
+        {
+          "name": "CP-A08 Listar facturas",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const facturas = pm.response.json();",
+                  "const esquemaFactura = {",
+                  "    type: 'object',",
+                  "    required: ['id', 'number', 'customerName', 'type', 'subtotal', 'iva', 'retencion', 'total', 'createdAt'],",
+                  "    properties: {",
+                  "        id: { type: 'integer' },",
+                  "        number: { type: 'string', pattern: '^FAC-\\\\d{5}$' },",
+                  "        customerName: { type: 'string', minLength: 1 },",
+                  "        type: { enum: ['Nacional', 'Exportacion', 'Gubernamental'] },",
+                  "        subtotal: { type: 'number', exclusiveMinimum: 0 },",
+                  "        iva: { type: 'number', minimum: 0 },",
+                  "        retencion: { type: 'number', minimum: 0 },",
+                  "        total: { type: 'number' },",
+                  "        customsCode: { type: ['string', 'null'] },",
+                  "        createdAt: { type: 'string' }",
+                  "    }",
+                  "};",
+                  "",
+                  "pm.test('CP-A08 Código 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('CP-A08 Devuelve las 7 facturas sembradas (o más)', () => {",
+                  "    pm.expect(facturas).to.be.an('array').with.length.of.at.least(7);",
+                  "});",
+                  "pm.test('CP-A08 Cada factura cumple el esquema', () => {",
+                  "    pm.response.to.have.jsonSchema({ type: 'array', items: esquemaFactura });",
+                  "});",
+                  "pm.test('CP-A08 Ordenadas de la más reciente a la más antigua', () => {",
+                  "    const fechas = facturas.map(f => new Date(f.createdAt).getTime());",
+                  "    pm.expect(fechas).to.eql([...fechas].sort((a, b) => b - a));",
+                  "});",
+                  "pm.test('CP-A08 Responde en menos de 1 segundo', () => pm.expect(pm.response.responseTime).to.be.below(1000));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "CP-A09 Factura inexistente",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CP-A09 Código 404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices",
+                "999999"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "CP-A10 Listar facturas sin token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CP-A10 Código 401 Unauthorized', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "CP-A11 Detalle de factura sembrada",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const factura = pm.response.json();",
+                  "",
+                  "pm.test('CP-A11 Código 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('CP-A11 Corresponde a la factura FAC-00001', () => pm.expect(factura.number).to.eql('FAC-00001'));",
+                  "pm.test('CP-A11 Incluye el total en letras (servicio SOAP legado o null si falla)', () => {",
+                  "    pm.expect(factura).to.have.property('totalInWords');",
+                  "});",
+                  "pm.test('CP-A11 El total cuadra: subtotal + IVA - retención', () => {",
+                  "    pm.expect(factura.total).to.eql(factura.subtotal + factura.iva - factura.retencion);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices",
+                "1"
+              ]
+            },
+            "description": ""
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Creación y reglas de negocio",
+      "description": "Motor de impuestos por tipo de factura (guiado por CSV) y control de acceso por rol.",
+      "item": [
+        {
+          "name": "CP-A12..A19 Crear factura (casos del CSV)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Arma el cuerpo de la petición a partir de la fila actual del CSV",
+                  "// (api/datos/casos-facturas.csv). Si se ejecuta sin archivo de datos,",
+                  "// usa un caso por defecto para que la petición siga siendo útil.",
+                  "const fila = pm.iterationData.toObject();",
+                  "const caso = fila.caso ? fila : {",
+                  "    caso: 'CP-A12', descripcion: 'Factura nacional (caso por defecto)', cliente: 'Postman Nacional',",
+                  "    tipo: 1, subtotal: 1000000, estadoEsperado: 201, ivaEsperado: 190000, retencionEsperada: 0, totalEsperado: 1190000",
+                  "};",
+                  "",
+                  "const cuerpo = {",
+                  "    customerName: caso.cliente || '',",
+                  "    type: Number(caso.tipo),",
+                  "    subtotal: Number(caso.subtotal)",
+                  "};",
+                  "if (caso.codigoAduanero) cuerpo.customsCode = caso.codigoAduanero;",
+                  "",
+                  "pm.variables.set('casoActual', JSON.stringify(caso));",
+                  "pm.variables.set('cuerpoFactura', JSON.stringify(cuerpo, null, 2));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const caso = JSON.parse(pm.variables.get('casoActual'));",
+                  "const id = `${caso.caso} ${caso.descripcion}`;",
+                  "const esperado = Number(caso.estadoEsperado);",
+                  "",
+                  "pm.test(`${id} -> código ${esperado}`, () => pm.response.to.have.status(esperado));",
+                  "",
+                  "if (esperado === 201) {",
+                  "    const factura = pm.response.json();",
+                  "",
+                  "    pm.test(`${caso.caso} Número consecutivo con formato FAC-00000`, () => {",
+                  "        pm.expect(factura.number).to.match(/^FAC-\\d{5}$/);",
+                  "    });",
+                  "    pm.test(`${caso.caso} IVA = ${caso.ivaEsperado}`, () => pm.expect(factura.iva).to.eql(Number(caso.ivaEsperado)));",
+                  "    pm.test(`${caso.caso} Retención = ${caso.retencionEsperada}`, () => pm.expect(factura.retencion).to.eql(Number(caso.retencionEsperada)));",
+                  "    pm.test(`${caso.caso} Total = ${caso.totalEsperado}`, () => pm.expect(factura.total).to.eql(Number(caso.totalEsperado)));",
+                  "    pm.test(`${caso.caso} Código aduanero solo en exportación`, () => {",
+                  "        if (Number(caso.tipo) === 2) pm.expect(factura.customsCode).to.eql(caso.codigoAduanero);",
+                  "        else pm.expect(factura.customsCode).to.be.null;",
+                  "    });",
+                  "    pm.test(`${caso.caso} Header Location apunta al recurso creado`, () => {",
+                  "        pm.expect(pm.response.headers.get('Location')).to.match(new RegExp(`/api/invoices/${factura.id}$`, 'i'));",
+                  "    });",
+                  "",
+                  "    // La primera factura creada se usa luego en CP-A20.",
+                  "    if (!pm.collectionVariables.get('idFacturaCreada')) {",
+                  "        pm.collectionVariables.set('idFacturaCreada', factura.id);",
+                  "        pm.collectionVariables.set('numeroFacturaCreada', factura.number);",
+                  "    }",
+                  "} else {",
+                  "    pm.test(`${caso.caso} El error se reporta en el campo ${caso.campoError}`, () => {",
+                  "        const campos = Object.keys(pm.response.json().errors).map(c => c.toLowerCase());",
+                  "        pm.expect(campos).to.include(caso.campoError.toLowerCase());",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": "Prueba guiada por datos. Cada fila de `api/datos/casos-facturas.csv` es una iteración con su cuerpo, código esperado y valores de impuestos esperados.",
+            "body": {
+              "mode": "raw",
+              "raw": "{{cuerpoFactura}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "CP-A20 Consultar la factura creada",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const factura = pm.response.json();",
+                  "",
+                  "pm.test('CP-A20 Código 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('CP-A20 Es la misma factura que se creó', () => {",
+                  "    pm.expect(factura.id).to.eql(Number(pm.collectionVariables.get('idFacturaCreada')));",
+                  "    pm.expect(factura.number).to.eql(pm.collectionVariables.get('numeroFacturaCreada'));",
+                  "});",
+                  "pm.test('CP-A20 La factura quedó persistida con sus impuestos', () => {",
+                  "    pm.expect(factura.total).to.eql(factura.subtotal + factura.iva - factura.retencion);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices/{{idFacturaCreada}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices",
+                "{{idFacturaCreada}}"
+              ]
+            },
+            "description": ""
+          }
+        },
+        {
+          "name": "CP-A21 AUDITOR intenta crear una factura",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Control de acceso por rol: solo OPERADOR puede crear.",
+                  "pm.test('CP-A21 Código 403 Forbidden', () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Intento auditor\",\n  \"type\": 1,\n  \"subtotal\": 100000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{tokenAuditor}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "CP-A22 Crear factura sin token",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la primera iteración: las demás iteraciones del CSV",
+                  "// recorren únicamente los casos de creación de facturas.",
+                  "if (pm.info.iteration > 0) { pm.execution.skipRequest(); }"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('CP-A22 Código 401 Unauthorized', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "invoices"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Sin token\",\n  \"type\": 1,\n  \"subtotal\": 100000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Seguridad",
+      "description": "Rate limiting del login.",
+      "item": [
+        {
+          "name": "CP-A23 Límite de intentos de login (rate limiting)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Se ejecuta solo en la última iteración, cuando ya se probaron todos los casos.",
+                  "if (pm.info.iteration < pm.info.iterationCount - 1) { pm.execution.skipRequest(); }",
+                  "const intentos = Number(pm.collectionVariables.get('intentosLogin') || 0) + 1;",
+                  "pm.collectionVariables.set('intentosLogin', intentos);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// El backend permite 5 intentos de login por minuto por IP (Program.cs).",
+                  "// Esta petición se repite hasta recibir 429 o agotar 6 intentos.",
+                  "const intentos = Number(pm.collectionVariables.get('intentosLogin'));",
+                  "const MAX_INTENTOS = 6;",
+                  "",
+                  "pm.test(`CP-A23 Intento ${intentos}: responde 401 o 429`, () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([401, 429]);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 429) {",
+                  "    pm.test('CP-A23 Bloquea los intentos excesivos con 429 Too Many Requests', () => {",
+                  "        pm.response.to.have.status(429);",
+                  "    });",
+                  "    pm.collectionVariables.unset('intentosLogin');",
+                  "} else if (intentos < MAX_INTENTOS) {",
+                  "    pm.execution.setNextRequest(pm.info.requestName);",
+                  "} else {",
+                  "    pm.test('CP-A23 Bloquea los intentos excesivos con 429 Too Many Requests', () => {",
+                  "        pm.expect.fail(`Tras ${MAX_INTENTOS} intentos no se recibió 429`);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Verifica la protección contra fuerza bruta. Debe ejecutarse al final, porque deja bloqueado el login durante un minuto.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{usuarioOperador}}\",\n  \"password\": \"IntentoFuerzaBruta1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "tokenOperador",
+      "value": ""
+    },
+    {
+      "key": "tokenAuditor",
+      "value": ""
+    },
+    {
+      "key": "idFacturaCreada",
+      "value": ""
+    },
+    {
+      "key": "numeroFacturaCreada",
+      "value": ""
+    }
+  ]
+}

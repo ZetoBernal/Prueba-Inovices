@@ -1,0 +1,36 @@
+{
+  "validas": [
+    {
+      "caso": "CP-W10",
+      "descripcion": "Factura nacional (IVA 19 %)",
+      "cliente": "Selenium Nacional",
+      "tipo": "Nacional",
+      "tipoEnTabla": "Nacional",
+      "subtotal": 1500000
+    },
+    {
+      "caso": "CP-W11",
+      "descripcion": "Factura de exportación (exenta, con código aduanero)",
+      "cliente": "Selenium Exportacion",
+      "tipo": "Exportación",
+      "tipoEnTabla": "Exportacion",
+      "subtotal": 2800000,
+      "codigoAduanero": "ADU-2026-SEL1"
+    },
+    {
+      "caso": "CP-W12",
+      "descripcion": "Factura gubernamental (IVA 19 % y retención 5 %)",
+      "cliente": "Selenium Gubernamental",
+      "tipo": "Gubernamental",
+      "tipoEnTabla": "Gubernamental",
+      "subtotal": 4300000
+    }
+  ],
+  "mensajes": {
+    "clienteObligatorio": "El cliente es obligatorio",
+    "tipoObligatorio": "Selecciona un tipo de factura",
+    "subtotalObligatorio": "El subtotal es obligatorio",
+    "subtotalMayorQueCero": "Debe ser mayor que cero",
+    "codigoObligatorio": "Obligatorio para facturas de exportación"
+  }
+}

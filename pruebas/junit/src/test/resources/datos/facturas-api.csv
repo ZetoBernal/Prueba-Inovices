@@ -1,0 +1,10 @@
+caso,descripcion,cliente,tipo,subtotal,codigoAduanero,estadoEsperado,ivaEsperado,retencionEsperada,totalEsperado,campoError
+CP-R11,Factura nacional con IVA del 19 %,JUnit API Nacional,1,2000000,,201,380000,0,2380000,
+CP-R12,Factura de exportación exenta,JUnit API Exportacion,2,3500000,ADU-2026-JA01,201,0,0,3500000,
+CP-R13,Factura gubernamental con IVA y retención,JUnit API Gubernamental,3,1000000,,201,190000,50000,1140000,
+CP-R14,Redondeo de medio peso hacia arriba,JUnit API Redondeo,3,150,,201,29,8,171,
+CP-R15,Nombre de cliente con 150 caracteres (límite válido),<150 caracteres>,1,100000,,201,19000,0,119000,
+CP-R16,Nombre de cliente con 151 caracteres (fuera del límite),<151 caracteres>,1,100000,,400,,,,CustomerName
+CP-R17,Exportación sin código aduanero,JUnit API Sin Codigo,2,500000,,400,,,,CustomsCode
+CP-R18,Subtotal negativo,JUnit API Negativo,1,-1000,,400,,,,Subtotal
+CP-R19,Tipo de factura inexistente (0),JUnit API Tipo Cero,0,100000,,400,,,,Type

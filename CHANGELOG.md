@@ -6,7 +6,9 @@ El formato sigue [Keep a Changelog 1.1.0](https://keepachangelog.com/es-ES/1.1.0
 
 ## [Sin publicar]
 
-Nada todavía. Los cambios posteriores a la línea base se anotan aquí antes de publicar la siguiente versión.
+### Agregado
+
+- Pruebas automatizadas en `pruebas/`: Selenium WebDriver y Postman con Newman (`selenium-postman/`), y JUnit 5 con Selenium WebDriver y TestRestTemplate (`junit/`).
 
 ## [1.0.0] - 2026-11-10
 

@@ -1,0 +1,4 @@
+caso,descripcion,cliente,tipo,tipoEnTabla,subtotal,codigoAduanero
+CP-J06,Factura nacional con IVA del 19 %,JUnit Web Nacional,Nacional,Nacional,2000000,
+CP-J07,Factura de exportación exenta con código aduanero,JUnit Web Exportacion,Exportación,Exportacion,3500000,ADU-2026-JW01
+CP-J08,Factura gubernamental con IVA y retención,JUnit Web Gubernamental,Gubernamental,Gubernamental,1000000,
